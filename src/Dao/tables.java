@@ -20,8 +20,8 @@ public class tables {
         try {
             con = ConnectionProvider.getCon();
             st = con.createStatement();
-            // st.executeUpdate("create table appuser(appuser_pk int AUTO_INCREMENT primary key,userRole varchar(50),name varchar(200),mobileNumber varchar (50),email varchar(200),password varchar(50),address varchar(200),status varchar(50))");
-            st.executeUpdate("insert into appuser (userRole,name,mobileNumber,email,password,address,status) values('SuperAdmin','Super Admin','12345','superadmin@testemail.com','admin','India','Active')");
+            //st.executeUpdate("create table appuser(appuser_pk int AUTO_INCREMENT primary key,userRole varchar(50),name varchar(200),mobileNumber varchar (50),email varchar(200),password varchar(50),address varchar(200),status varchar(50))");
+            st.executeUpdate("insert into appuser (userRole,name,mobileNumber,email,password,address,status) values('SuperAdmin','Super Admin','12345','abhijeet1@mail.com','admin','India','Active')");
             JOptionPane.showMessageDialog(null, "Table Created Successfully");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
