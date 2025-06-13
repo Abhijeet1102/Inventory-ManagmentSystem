@@ -27,13 +27,28 @@ public class ManageUser extends javax.swing.JFrame {
     }
 
     private boolean validateFields(String formType) {
-        if (formType.equals("edit") && !txtName.getText().equals("") && !txtMobileNumber.getText().equals("") && !txtEmail.getText().equals("") && !txtAddress.getText().equals("")) {
-            return false;
-        } else if (formType.equals("new") && !txtName.getText().equals("") && !txtMobileNumber.getText().equals("") && !txtEmail.getText().equals("") && !txtAddress.getText().equals("") && !txtPassword.getText().equals("")) {
-            return false;
-        } else {
+       String name = txtName.getText();
+        String mobile = txtMobileNumber.getText();
+        String email = txtEmail.getText();
+
+        if (name.equals("") || mobile.equals("") || email.equals("")) {
+            JOptionPane.showMessageDialog(null, "All fields are required.");
             return true;
         }
+
+        // Mobile number should be exactly 10 digits
+        if (!mobile.matches("\\d{10}")) {
+            JOptionPane.showMessageDialog(null, "Mobile number must be exactly 10 digits.");
+            return true;
+        }
+
+        // Email must contain '@'
+        if (!email.contains("@")) {
+            JOptionPane.showMessageDialog(null, "Email must contain '@'.");
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -110,6 +125,11 @@ public class ManageUser extends javax.swing.JFrame {
         txtMobileNumber.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtMobileNumberActionPerformed(evt);
+            }
+        });
+        txtMobileNumber.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtMobileNumberKeyTyped(evt);
             }
         });
         getContentPane().add(txtMobileNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(464, 155, 386, -1));
@@ -271,7 +291,7 @@ public class ManageUser extends javax.swing.JFrame {
         TableModel model = tableUser.getModel();
 
         String id = model.getValueAt(index, 0).toString();
-        appuser_pk = Integer.parseInt(id); // This now works
+        appuser_pk = Integer.parseInt(id);
 
         txtName.setText(model.getValueAt(index, 1).toString());
         txtMobileNumber.setText(model.getValueAt(index, 2).toString());
@@ -290,7 +310,7 @@ public class ManageUser extends javax.swing.JFrame {
 
         txtPassword.setEditable(false);
         txtPassword.setBackground(Color.GRAY);
-        txtPassword.setText("********"); // optional: mask the password
+        txtPassword.setText("********");
 
         btnSave.setEnabled(false);
         btnUpdate.setEnabled(true);
@@ -335,9 +355,99 @@ public class ManageUser extends javax.swing.JFrame {
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
         // TODO add your handling code here:
+//        setVisible(false);
+//        new ManageUser().setVisible(true);
+
+//-----------------------------------------------------------------------------
+        if (appuser_pk == 0) {
+            JOptionPane.showMessageDialog(null, "Please select a category to delete.");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(null,"Are you sure you want to delete this aapuser?","Confirm",JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try (Connection con = ConnectionProvider.getCon(); 
+             PreparedStatement ps = con.prepareStatement("DELETE FROM appuser WHERE appuser_pk =?")) {
+
+                ps.setInt(1, appuser_pk);
+                int rowsAffected = ps.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(null, "aapuser deleted successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Failed to delete category.");
+                }
+
+                // Refresh the UI
+                setVisible(false);
+                new ManageUser().setVisible(true);
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Error occurred: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        ////---------------------------------------------------------
+
+//  int confirm = JOptionPane.showConfirmDialog(
+//                null,
+//                "Are you sure you want to delete all products?",
+//                "Confirm",
+//                JOptionPane.YES_NO_OPTION
+//        );
+//
+//        if (confirm == JOptionPane.YES_OPTION) {
+//            try {
+//                Connection con = ConnectionProvider.getCon();
+//                Statement st = con.createStatement();
+//
+//                // Delete all rows from product
+//                st.executeUpdate("DELETE FROM appuser");
+//
+//                // Reset auto-increment if needed
+//                st.executeUpdate("ALTER TABLE appuser AUTO_INCREMENT = 1");
+//
+//                JOptionPane.showMessageDialog(null, "All products deleted successfully.");
+//
+//                // Clear table data manually instead of reloading entire form
+//                DefaultTableModel model = (DefaultTableModel) tableUser.getModel();
+//                model.setRowCount(0); // Clears visible table rows
+//
+//                // Reset input fields manually instead of calling the full reset method
+//                txtName.setText("");
+//                txtMobileNumber.setText("");
+//                txtEmail.setText("");
+//                txtAddress.setText("");
+//                comboBoxStatus.setSelectedIndex(0);
+//
+//            } catch (Exception e) {
+//                JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+//            }
+//        }
+
         setVisible(false);
         new ManageUser().setVisible(true);
+
+
     }//GEN-LAST:event_btnResetActionPerformed
+
+    private void txtMobileNumberKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMobileNumberKeyTyped
+        // TODO add your handling code here:
+        char c = evt.getKeyChar();
+        String text = txtMobileNumber.getText();
+
+        // 1. Allow only digits
+        if (!Character.isDigit(c)) {
+            evt.consume(); // Block character input
+            return;
+        }
+
+        // 2. Block input after 10 digits
+        if (text.length() >= 10) {
+            evt.consume(); // Block extra digits
+        }
+    }//GEN-LAST:event_txtMobileNumberKeyTyped
 
     /**
      * @param args the command line arguments

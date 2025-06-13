@@ -19,7 +19,23 @@ public class Login extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
     }
+private boolean isValidLoginInput() {
+    String input = txtEmail.getText().trim();
 
+    // Check if it's a 10-digit mobile number
+    if (input.matches("\\d{10}")) {
+        return true;
+    }
+
+    // Check if it's a valid email with '@'
+    if (input.contains("@")) {
+        return true;
+    }
+
+    // Otherwise invalid input
+    JOptionPane.showMessageDialog(null, "Please enter a valid 10-digit Mobile Number or an Email with '@'");
+    return false;
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -89,6 +105,11 @@ public class Login extends javax.swing.JFrame {
         getContentPane().add(txtPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 400, 350, 34));
 
         txtEmail.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtEmail.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtEmailKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 310, 350, 30));
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/login-background_1.PNG"))); // NOI18N
@@ -147,6 +168,37 @@ public class Login extends javax.swing.JFrame {
          jButton2.doClick();
     }
     }//GEN-LAST:event_jButton2KeyPressed
+
+    private void txtEmailKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEmailKeyTyped
+        // TODO add your handling code here:
+        char c = evt.getKeyChar();
+    String text = txtEmail.getText();
+
+    // If first character is a digit, treat input as mobile number
+    if (!text.isEmpty() && Character.isDigit(text.charAt(0))) {
+        // Mobile number mode
+        if (!Character.isDigit(c)) {
+            evt.consume(); // Only digits allowed
+            return;
+        }
+        if (text.length() >= 10) {
+            evt.consume(); // Max 10 digits
+        }
+    } else {
+        // Email mode
+        if (!Character.isLetterOrDigit(c) && c != '@' && c != '.' && c != '_' && c != '-') {
+            evt.consume(); // Block unwanted characters
+            return;
+        }
+
+        // Tooltip warning if @ not present
+        if (text.length() >= 5 && !text.contains("@")) {
+            txtEmail.setToolTipText("Email must contain '@'");
+        } else {
+            txtEmail.setToolTipText(null);
+        }
+    }
+    }//GEN-LAST:event_txtEmailKeyTyped
 
     /**
      * @param args the command line arguments
